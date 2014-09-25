@@ -152,7 +152,7 @@ BOOL SHKinit;
     UIViewController *result = [self getCurrentRootViewController];
     
     // Find the top most view controller being displayed (so we can add the modal view to it and not one that is hidden)
-	while (result.presentedViewController != nil) result = result.presentedViewController;
+	while (result.presentedViewController != nil && result.presentedViewController.class != UIAlertController.class) result = result.presentedViewController;
     
     NSAssert(result, @"ShareKit: There is no view controller to display from");
 	return result;  
@@ -241,7 +241,9 @@ BOOL SHKinit;
         vc.modalTransitionStyle = [SHK modalTransitionStyleForController:vc];
     
     UIViewController *topViewController = [self rootViewForUIDisplay];
-    [topViewController presentViewController:vc animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [topViewController presentViewController:vc animated:YES completion:nil];
+    });
 
     self.currentView = vc;
 	self.pendingView = nil;
