@@ -125,18 +125,7 @@
 	NSString *body = self.item.text ? self.item.text : @"";
 	BOOL isHTML = self.item.isMailHTML || self.item.isHTMLText;
     NSString *separator = (isHTML ? @"<br/><br/>" : @"\n\n");
-		
-		if (self.item.URL != nil)
-		{
-			NSString *urlStr = [self.item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-			
-            if ([body length] > 0) {
-                body = [body stringByAppendingFormat:@"%@%@", separator, urlStr];
-            } else {
-                body = [body stringByAppendingFormat:@"%@", urlStr];
-            }
-		}
-		
+				
 		if (self.item.file)
 		{
 			NSString *attachedStr = SHKLocalizedString(@"Attached: %@", self.item.title ? self.item.title : self.item.file.filename);
