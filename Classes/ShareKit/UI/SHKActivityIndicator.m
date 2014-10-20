@@ -408,7 +408,9 @@
 
 - (void)setProperRotation:(BOOL)animated
 {
-	UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+
+     if ((BOOL)([[UIDevice currentDevice].systemVersion floatValue] < 8.0)) {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 	
 	if (animated)
 	{
@@ -430,6 +432,7 @@
 	
 	if (animated)
 		[UIView commitAnimations];
+     }
 }
 
 @end
