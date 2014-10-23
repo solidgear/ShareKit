@@ -125,28 +125,39 @@
 	NSString *body = self.item.text ? self.item.text : @"";
 	BOOL isHTML = self.item.isMailHTML || self.item.isHTMLText;
     NSString *separator = (isHTML ? @"<br/><br/>" : @"\n\n");
-				
-		if (self.item.file)
-		{
-			NSString *attachedStr = SHKLocalizedString(@"Attached: %@", self.item.title ? self.item.title : self.item.file.filename);
-			
+    
+    if (self.item.URL != nil)
+    {
+        NSString *urlStr = [self.item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        if ([body rangeOfString:urlStr].location == NSNotFound) {
             if ([body length] > 0) {
-                body = [body stringByAppendingFormat:@"%@%@", separator, attachedStr];
+                body = [body stringByAppendingFormat:@"%@%@", separator, urlStr];
             } else {
-                body = [body stringByAppendingFormat:@"%@", attachedStr];
+                body = [body stringByAppendingFormat:@"%@", urlStr];
             }
-            		}
-		
-		// fallback
-		if (body == nil)
-			body = @"";
-		
-		// sig
-		if (self.item.mailShareWithAppSignature)
-		{
-			body = [body stringByAppendingString:separator];
-			body = [body stringByAppendingString:SHKLocalizedString(@"Sent from %@", SHKCONFIG(appName))];
-		}
+        }
+    }
+    if (self.item.file)
+    {
+        NSString *attachedStr = SHKLocalizedString(@"Attached: %@", self.item.title ? self.item.title : self.item.file.filename);
+        
+        if ([body length] > 0) {
+            body = [body stringByAppendingFormat:@"%@%@", separator, attachedStr];
+        } else {
+            body = [body stringByAppendingFormat:@"%@", attachedStr];
+        }
+    }
+    
+    // fallback
+    if (body == nil)
+        body = @"";
+    
+    // sig
+    if (self.item.mailShareWithAppSignature)
+    {
+        body = [body stringByAppendingString:separator];
+        body = [body stringByAppendingString:SHKLocalizedString(@"Sent from %@", SHKCONFIG(appName))];
+    }
 	
 	if (self.item.file)
 		[mailController addAttachmentData:self.item.file.data mimeType:self.item.file.mimeType fileName:self.item.file.filename];
