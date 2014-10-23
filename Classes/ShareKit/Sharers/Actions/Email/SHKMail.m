@@ -29,7 +29,7 @@
 #import "SharersCommonHeaders.h"
 
 #define MAX_ATTACHMENT_SIZE 10*1024*1024 //10mb
-
+static NSString * const kPSReaderViewController = @"PSReaderViewController";
 @implementation SHKMail
 
 #pragma mark -
@@ -108,7 +108,22 @@
 	
 	return [self sendMail]; // Put the actual sending action in another method to make subclassing SHKMail easier
 }
-
+-(BOOL)isControllerPSReaderViewController{
+    UIWindow *keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
+    
+    if ( [keyWindow.rootViewController isKindOfClass: [UINavigationController class] ] ) {
+        UINavigationController *keyNavigationController = (UINavigationController *)keyWindow.rootViewController;
+        if ( [keyNavigationController.topViewController isKindOfClass: [UITabBarController class] ] ) {
+            UITabBarController *selectedTabBarController = (UITabBarController *)keyNavigationController.topViewController;
+            if ( [selectedTabBarController.selectedViewController isKindOfClass: [UINavigationController class] ] ) {
+                UINavigationController *selectedNavigationController = (UINavigationController *)selectedTabBarController.selectedViewController;
+                NSString *rootViewControllerClassName = NSStringFromClass([selectedNavigationController.topViewController class]);
+                return [rootViewControllerClassName isEqualToString:kPSReaderViewController];
+            }
+        }
+    }
+    return NO;
+}
 - (BOOL)sendMail
 {	
 	MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
@@ -125,7 +140,19 @@
 	NSString *body = self.item.text ? self.item.text : @"";
 	BOOL isHTML = self.item.isMailHTML || self.item.isHTMLText;
     NSString *separator = (isHTML ? @"<br/><br/>" : @"\n\n");
-				
+		
+    
+    if (self.item.URL != nil)
+    {
+        if ([self isControllerPSReaderViewController]) {
+            NSString *urlStr = [self.item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            if ([body length] > 0) {
+                body = [body stringByAppendingFormat:@"%@%@", separator, urlStr];
+            } else {
+                body = [body stringByAppendingFormat:@"%@", urlStr];
+            }
+        }
+    }
 		if (self.item.file)
 		{
 			NSString *attachedStr = SHKLocalizedString(@"Attached: %@", self.item.title ? self.item.title : self.item.file.filename);
