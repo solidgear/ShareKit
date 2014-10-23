@@ -29,7 +29,7 @@
 #import "SharersCommonHeaders.h"
 
 #define MAX_ATTACHMENT_SIZE 10*1024*1024 //10mb
-static NSString * const kPSReaderControllerView = @"PSReaderViewController";
+static NSString * const kPSReaderViewController = @"PSReaderViewController";
 @implementation SHKMail
 
 #pragma mark -
@@ -118,11 +118,11 @@ static NSString * const kPSReaderControllerView = @"PSReaderViewController";
             if ( [selectedTabBarController.selectedViewController isKindOfClass: [UINavigationController class] ] ) {
                 UINavigationController *selectedNavigationController = (UINavigationController *)selectedTabBarController.selectedViewController;
                 NSString *rootViewControllerClassName = NSStringFromClass([selectedNavigationController.topViewController class]);
-                return [rootViewControllerClassName isEqualToString:kPSReaderControllerView];
+                return [rootViewControllerClassName isEqualToString:kPSReaderViewController];
             }
         }
     }
-    return 0;
+    return NO;
 }
 - (BOOL)sendMail
 {	
