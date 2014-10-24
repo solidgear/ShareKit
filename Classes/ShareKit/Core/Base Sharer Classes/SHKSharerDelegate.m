@@ -26,7 +26,7 @@
 #import "SHKConfiguration.h"
 #import "SHK.h"
 #import "Debug.h"
-
+static NSInteger const kActivitiIndicator = 160;
 @implementation SHKSharerDelegate
 
 #pragma mark -
@@ -48,10 +48,33 @@
 		[self.activityIndicator displayActivity:SHKLocalizedString(@"Saving to %@", [[sharer class] sharerTitle]) forSharer:sharer];
 }
 
+-(BOOL)isIpadAndLandscape{
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) &&([[UIDevice currentDevice] orientation] == UIInterfaceOrientationLandscapeLeft || [[UIDevice currentDevice] orientation] == UIInterfaceOrientationLandscapeLeft) ;
+}
+-(void)calculatePositonFrameActivityIndicator{
+    CGRect applicationFrame = [[UIScreen mainScreen] applicationFrame];
+    CGRect centeredFrame;
+    if ([self isIpadAndLandscape]) {
+        centeredFrame = CGRectMake((applicationFrame.size.width/2) - kActivitiIndicator/3,
+                                   (applicationFrame.size.height/2) - kActivitiIndicator/3,
+                                   kActivitiIndicator,
+                                   kActivitiIndicator);
+    }else{
+        centeredFrame = CGRectMake(applicationFrame.size.width/2 - kActivitiIndicator/2,
+                                   applicationFrame.size.height/2 - kActivitiIndicator/2,
+                                   kActivitiIndicator,
+                                   kActivitiIndicator);
+        
+    }
+    self.activityIndicator.frame= centeredFrame;
+}
+
 - (void)sharerFinishedSending:(SHKSharer *)sharer
 {
-	if (!sharer.quiet)
-		[self.activityIndicator displayCompleted:SHKLocalizedString(@"Saved!") forSharer:sharer];
+    [self calculatePositonFrameActivityIndicator];
+    if (!sharer.quiet)
+        [self.activityIndicator displayCompleted:SHKLocalizedString(@"Saved!") forSharer:sharer];
+    
 }
 
 - (void)sharer:(SHKSharer *)sharer failedWithError:(NSError *)error shouldRelogin:(BOOL)shouldRelogin
